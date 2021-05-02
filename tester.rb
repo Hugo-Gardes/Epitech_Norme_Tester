@@ -83,7 +83,7 @@ def check_too_many_parameters(file)
         end
         if comma > 3
             comma += 1
-            print "[#{file}: #{line_number}]".red
+            print "[#{file}:#{line_number}]".red
             puts " too many args on funct : #{line_preced}, #{comma} > 4"
             $major += 1
         end
@@ -297,32 +297,32 @@ def check_misplaced_space_bis(file, line, line_number)
     i = 0
     is_enter = false
     while (line[i] and line !~ /.*\/\/*/)
-        if (check_match(line, i, " return(") and char_is_not_string(line[i], line, i) == false)
+        if (check_match(line, i, " return(") and char_is_not_string(line[i], line, i) == true)
             print "[#{file}:#{line_number}:#{i}]".yellow
             puts " missing space after return"
             $minor += 1
         end
-        if (check_match(line, i, " for(") and char_is_not_string(line[i], line, i) == false)
+        if (check_match(line, i, " for(") and char_is_not_string(line[i], line, i) == true)
             print "[#{file}:#{line_number}:#{i}]".yellow
             puts " missing space after for"
             $minor += 1
         end
-        if (check_match(line, i, " while(") and char_is_not_string(line[i], line, i) == false)
+        if (check_match(line, i, " while(") and char_is_not_string(line[i], line, i) == true)
             print "[#{file}:#{line_number}:#{i}]".yellow
             puts " missing space after while"
             $minor += 1
         end
-        if (check_match(line, i, " if(") and char_is_not_string(line[i], line, i) == false)
+        if (check_match(line, i, " if(") and char_is_not_string(line[i], line, i) == true)
             print "[#{file}:#{line_number}:#{i}]".yellow
             puts " missing space after if"
             $minor += 1
         end
-        if (check_match(line, i, " }else") and char_is_not_string(line[i], line, i) == false)
+        if (check_match(line, i, " }else") and char_is_not_string(line[i], line, i) == true)
             print "[#{file}:#{line_number}:#{i}]".yellow
             puts " missing space before else"
             $minor += 1
         end
-        if (check_match(line, i, " switch(") and char_is_not_string(line[i], line, i) == false)
+        if (check_match(line, i, " switch(") and char_is_not_string(line[i], line, i) == true)
             print "[#{file}:#{line_number}:#{i}]".yellow
             puts " missing space after switch"
             $minor += 1
