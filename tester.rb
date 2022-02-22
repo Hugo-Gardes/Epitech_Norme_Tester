@@ -27,7 +27,7 @@ end
 
 def check_return_without_parentheses(file, line, line_number)
     if line =~ /return/ #Si la ligne contient un return
-        if line !~ /return.*\(.*\)/ #Si y'a pas de parantheses
+        if line !~ /return.*\(.*\)/ and line !~ /return;/ and line !~ /\/\/ return/ and line !~ /\/\/return/#Si y'a pas de parantheses
             print ("[#{file}:#{line_number}]").yellow
             puts ("return without parantheses")
             $minor += 1
@@ -91,6 +91,33 @@ def check_too_many_parameters(file)
     }
 end
 
+def check_funct_name(line_preced, file, line_number)
+    special = "?<>',?[]}{=-)(*&^%$#`~{}."
+    regex = /[#{special.gsub(/./){|char| "\\#{char}"}}]/
+    line_parse = line_preced.split(/ /)
+    line_parsed = line_parse[1].split(/\(/)
+    if (line_preced[0] =~ /[A-Z]/ or line_parse[0] =~ /[A-Z]/)
+        print "[#{file}:#{line_number - 1}]".red
+        puts " V1 snake case convention not respected : uppercase char : #{line_preced}"
+        $major += 1
+    end
+    if (line_preced[0] != "(")
+        if (line_parsed[0][0] == "*")
+            if (line_preced[0] =~ regex)
+                print "[#{file}:#{line_number - 1}]".red
+                puts " V1 snake case convention not respected : bad char : #{line_parsed[0]}"
+                $major += 1
+            end
+        else
+            if (line_parsed[0] =~ regex)
+                print "[#{file}:#{line_number - 1}]".red
+                puts " V1 snake case convention not respected : bad char : #{line_parsed[0]}"
+                $major += 1
+            end
+        end
+    end
+end
+
 def check_void_when_no_parameter(file)
     functionCount = 0
     descriptor = 0
@@ -99,8 +126,9 @@ def check_void_when_no_parameter(file)
     File.foreach(file) { |line|
         line_number += 1
         if (descriptor == 1 and line == "\{\n")
+            check_funct_name(line_preced, file, line_number)
             if (line_preced =~ /.*\(\)/)
-                print "[#{file}: #{line_number}]".red
+                print "[#{file}:#{line_number}]".red
                 puts " excepted void on empty descriptor : #{line_preced}"
                 $major += 1
             end
@@ -358,11 +386,22 @@ def parseFile(file)
         check_misplaced_space_bis(file, line, line_number)
         line_number += 1
     }
+    line_nulber_end = 1
+    File.foreach(file) { |line|
+        line_nulber_end += 1;
+        if (line_number == line_nulber_end)
+            if (line !~ /\n/)
+                print "[#{file}:#{line_number} #{line}]".red
+                puts " c files must have line break"
+                $major += 1
+            end
+        end
+    }
 end
 
 require 'find'
 Find.find('.') { |f|
-    if ((f !~ /tester.rb/ and f !~ /.*\.txt/ and f !~ /.*\.c/ and f !~ /.*\.h/ and f != "." and File.file?(f) and f != "./Makefile" and f !~ /.*\.png/ and f !~ /.*\.jpg/ and f !~ /.*\.ttf/ and f !~ /\.git.*/ and f !~ /.*\.xml/ and f !~ /.*\.mp3/ and f !~ /.*\.mp4/ and f !~ /.*\.ogg/) or f =~ /#*#/ or f =~ /.*~/ or f =~ /.*.break/)
+    if ((f !~ /tester.rb/ and f !~ /.*\.txt/ and f !~ /.*\.c/ and f !~ /.*\.h/ and f != "." and File.file?(f) and f !~ /Makefile/ and f !~ /.*\.png/ and f !~ /.*\.jpg/ and f !~ /.*\.ttf/ and f !~ /\.git.*/ and f !~ /.*\.xml/ and f !~ /.*\.mp3/ and f !~ /.*\.mp4/ and f !~ /.*\.ogg/) or f =~ /#*#/ or f =~ /.*~/ or f =~ /.*.break/)
         f.slice!(0, 2)
         print "[#{f}]".red
         puts " not a require for compilation"
