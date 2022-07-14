@@ -27,8 +27,9 @@ end
 
 def check_return_without_parentheses(file, line, line_number)
     if line =~ /return/ #Si la ligne contient un return
-        if line !~ /return.*\(.*\)/ and line !~ /return;/ and line !~ /\/\/ return/ and line !~ /\/\/return/#Si y'a pas de parantheses
-            print ("[#{file}:#{line_number}]").yellow
+        parsed = line.delete(" ").delete("\t");
+        if line !~ /return.*\(.*\)/ and line !~ /return;/ and line !~ /\/\/ return/ and line !~ /\/\/return/ and parsed[0] == 'r'#Si y'a pas de parantheses
+            print ("\t[#{file}:#{line_number}]").yellow
             puts ("return without parantheses")
             $minor += 1
         end
@@ -258,7 +259,7 @@ def check_misplaced_space(file, line, line_number)
     if_is_space = false
     ib = 0
     while index < line.length() do
-        if (line[index] == ',' and line[index + 1] != ' ' and line !~ /\/\/*/ and char_is_not_string(line[index], line, index))
+        if (line[index] == ',' and line[index + 1] != ' ' and line !~ /\/\/*/ and line[index + 1] != "\n" and char_is_not_string(line[index], line, index))
             print "[#{file}:#{line_number}:#{index + 1}]".yellow
             puts " must have space after comma"
             $minor += 1
@@ -407,7 +408,17 @@ Find.find('.') { |f|
         puts " not a require for compilation"
         $major += 1
     end
-    if (f =~ /.*\.c/ and f !~ /#*#/ and f !~ /.*~/ and f !~ /.*.break/)
+    if (f =~ /.*\.h/ and f !~ /#*#/ and f !~ /.*~/ and f !~ /.*.break/)
+        f.slice!(0, 2)
+        line_number = 1
+        File.foreach(f) { |line|
+            # check_multi_asignement(file, line, line_number)
+            check_line_too_long(f, line, line_number)
+            check_misplaced_space(f, line, line_number)
+            check_misplaced_space_bis(f, line, line_number)
+            line_number += 1
+        }
+    elsif (f =~ /.*\.c/ and f !~ /#*#/ and f !~ /.*~/ and f !~ /.*.break/)
         f.slice!(0, 2)
         parseFile(f)
     end
