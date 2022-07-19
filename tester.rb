@@ -226,12 +226,12 @@ def check_bad_header_separation(file, line, line_number)
                 end
             end
     end
-    if (line =~ /#define.*/)
+    if (line =~ /.*#define.*/)
         print "[#{file}:#{line_number}]".red
         puts (" define on .c : #{line}")
         $major += 1
     end
-    if (line =~ /static.*\(.*\).*/)
+    if (line =~ /.*static.*\(.*\).*/)
         print "[#{file}:#{line_number}]".yellow
         puts (" static function on .c : #{line}")
         $minor += 1
@@ -239,12 +239,12 @@ def check_bad_header_separation(file, line, line_number)
 end
 
 def check_indent(file, line, line_number)
-    if (line =~ /                */)
+    if (line.scan(/ /).size > 16)
         print "[#{file}:#{line_number}]".red
         puts (" must be less than 4 indent")
         $major += 1
     end
-    if (line =~ /\t\t*/)
+    if (line =~ /^\t/)
         print "[#{file}:#{line_number}]".red
         puts (" must start with space not tab")
         $major += 1
