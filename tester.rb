@@ -195,7 +195,7 @@ def check_bad_header_separation(file, line, line_number)
                     $major += 1
                 end
             when 2
-                if (line != "** EPITECH PROJECT, 2020\n" and line != "** EPITECH PROJECT, 2021\n")
+                if (line !~ /.*.* EPITECH PROJECT, \d\d\d\d\n/)
                     print "[#{file}:#{line_number}]".red
                     puts " error : bad header or corrupted header"
                     $major += 1
